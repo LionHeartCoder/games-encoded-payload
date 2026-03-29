@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bryan Koury | Games</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+    
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #4ade80;
+      --accent-glow: rgba(74, 222, 128, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bg-animation {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -1;
+      background: radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.15), transparent 25%),
+                  radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.15), transparent 25%);
+      animation: floatBg 20s infinite alternate;
+    }
+
+    @keyframes floatBg {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(30deg); }
+    }
+
+    header {
+      padding: 2rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo span { color: var(--accent); }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+      margin-left: 2rem;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero {
+      text-align: center;
+      padding: 6rem 1rem 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-size: 4.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      padding: 2rem 5%;
+      max-width: 1400px;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), var(--accent-glow), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(74, 222, 128, 0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    
+    .game-card:hover::before { opacity: 0.15; }
+
+    .game-content { position: relative; z-index: 1; }
+
+    .game-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--accent), #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .game-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .game-desc {
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+
+    .game-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: gap 0.3s;
+    }
+    .game-card:hover .game-link { gap: 0.8rem; }
+
+    footer {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+      margin-top: 4rem;
+    }
+
+    .coming-soon {
+      opacity: 0.6;
+      border-style: dashed;
+    }
+    .coming-soon:hover {
+      transform: none; border-color: var(--card-border); box-shadow: none; cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+  
+  <header>
+    <a href="/" class="logo">Bryan <span>Koury</span></a>
+    <nav class="nav-links">
+      <a href="/">Back to Main</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>My Digital Playground</h1>
+      <p>A collection of web-based games and interactive experiments I've built to explore logic, AI, and creative coding. Ready to play?</p>
+    </section>
+
+    <div class="games-grid" id="gamesGrid">
+      
+      <!-- Voyager -->
+      <a href="/games/voyager" class="game-card">
+        <div class="game-content">
+          <div class="game-icon">🌌</div>
+          <h2 class="game-title">Voyager</h2>
+          <p class="game-desc">Embark on a stellar expedition into deep space. Navigate through the unknown and discover new challenges.</p>
+          <span class="game-link">Play Now &rarr;</span>
+        </div>
+      </a>
+
+      <!-- Space Invaders -->
+      <a href="/games/space-invaders" class="game-card">
+        <div class="game-content">
+          <div class="game-icon">👾</div>
+          <h2 class="game-title">Space Invaders</h2>
+          <p class="game-desc">Defend Earth from continuous waves of incoming aliens in this classic arcade reimagining.</p>
+          <span class="game-link">Play Now &rarr;</span>
+        </div>
+      </a>
+
+      <!-- Naval Combat -->
+      <a href="/games/naval-combat" class="game-card">
+        <div class="game-content">
+          <div class="game-icon">🚢</div>
+          <h2 class="game-title">Naval Combat</h2>
+          <p class="game-desc">Take command of your fleet in strategic seaside battles and outmaneuver your opponent.</p>
+          <span class="game-link">Play Now &rarr;</span>
+        </div>
+      </a>
+
+      <!-- Coming Soon Placeholder -->
+      <a href="#" class="game-card coming-soon">
+        <div class="game-content">
+          <div class="game-icon">🚀</div>
+          <h2 class="game-title">Next Game Launching Soon</h2>
+          <p class="game-desc">I'm currently coding my next interactive experience. Check back later to see what I've built!</p>
+          <span class="game-link">In Development <span style="letter-spacing: 2px;">...</span></span>
+        </div>
+      </a>
+      
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span> Bryan Koury. Built with curiosity & code.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mouse glow effect for cards
+    document.getElementById('gamesGrid').onmousemove = e => {
+      for(const card of document.getElementsByClassName("game-card")) {
+        const rect = card.getBoundingClientRect(),
+              x = e.clientX - rect.left,
+              y = e.clientY - rect.top;
+        card.style.setProperty("--mouse-x", x + "px");
+        card.style.setProperty("--mouse-y", y + "px");
+      }
+    }
+  </script>
+</body>
+</html>
