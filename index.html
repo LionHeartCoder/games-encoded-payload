@@ -3,287 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bryan Koury | Games</title>
+  <title>Bryan Koury · Arcade</title>
+  <meta name="description" content="Browser games built by Bryan Koury — creative coding experiments in physics, AI opponents, and rendering.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23060a14'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%23fbbf24' stroke-width='6'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle'%3E👾%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
-    
     :root {
-      --bg-color: #0b0f19;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent: #4ade80;
-      --accent-glow: rgba(74, 222, 128, 0.4);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg: #060a14;
+      --panel: rgba(255, 255, 255, 0.03);
+      --line: rgba(148, 197, 255, 0.12);
+      --text: #e8eefc;
+      --muted: #8fa0bf;
+      --cyan: #22d3ee;
+      --teal: #5eead4;
+      --amber: #fbbf24;
     }
-    
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
     body {
-      font-family: 'Outfit', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      overflow-x: hidden;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
-    .bg-animation {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      z-index: -1;
-      background: radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.15), transparent 25%),
-                  radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.15), transparent 25%);
-      animation: floatBg 20s infinite alternate;
+    .bg-grid {
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(700px 500px at 20% 10%, rgba(34, 211, 238, 0.08), transparent 60%),
+        radial-gradient(700px 500px at 80% 90%, rgba(251, 191, 36, 0.06), transparent 60%);
     }
-
-    @keyframes floatBg {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(30deg); }
+    .bg-grid::after {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(148,197,255,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148,197,255,0.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%);
     }
 
     header {
-      padding: 2rem 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 1.4rem 5%;
+      display: flex; justify-content: space-between; align-items: center;
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--card-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6, 10, 20, 0.75);
     }
-
     .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      text-decoration: none;
-      color: var(--text-main);
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--text); text-decoration: none;
     }
-    
-    .logo span { color: var(--accent); }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s ease;
-      margin-left: 2rem;
+    .logo span { color: var(--cyan); }
+    .logo .cursor { color: var(--amber); animation: blink 1.1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .back {
+      color: var(--muted); text-decoration: none; font-weight: 600;
+      font-size: 0.9rem; transition: color 0.25s ease;
+      font-family: 'JetBrains Mono', monospace;
     }
-    .nav-links a:hover { color: var(--accent); }
+    .back:hover { color: var(--teal); }
 
-    .hero {
-      text-align: center;
-      padding: 6rem 1rem 3rem;
-      max-width: 800px;
-      margin: 0 auto;
+    .hero { text-align: center; padding: 5rem 1rem 2.5rem; max-width: 760px; margin: 0 auto; }
+    .kicker {
+      color: var(--amber); font-size: 0.85rem; letter-spacing: 0.1em;
+      margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;
     }
     .hero h1 {
-      font-size: 4.5rem;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(to right, #ffffff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: clamp(2.6rem, 8vw, 4.5rem); font-weight: 900;
+      line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 1.2rem;
     }
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      margin-bottom: 3rem;
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(100deg, var(--cyan), var(--teal), var(--amber));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
     }
+    .hero p { font-size: 1.1rem; color: var(--muted); }
 
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 2rem;
-      padding: 2rem 5%;
-      max-width: 1400px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem 5% 3rem;
+      max-width: 1300px; margin: 0 auto; width: 100%;
       flex: 1;
     }
-
     .game-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: var(--panel);
+      border: 1px solid var(--line);
       border-radius: 16px;
       padding: 2rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      text-decoration: none;
-      color: inherit;
+      position: relative; overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      text-decoration: none; color: inherit;
     }
-
     .game-card::before {
       content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), var(--accent-glow), transparent 40%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      z-index: 0;
+      position: absolute; inset: 0;
+      background: radial-gradient(700px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(34, 211, 238, 0.12), transparent 40%);
+      opacity: 0; transition: opacity 0.35s ease;
       pointer-events: none;
     }
-
     .game-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      border-color: rgba(74, 222, 128, 0.3);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      transform: translateY(-8px);
+      border-color: rgba(34, 211, 238, 0.45);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), 0 0 30px rgba(34, 211, 238, 0.1);
     }
-    
-    .game-card:hover::before { opacity: 0.15; }
-
-    .game-content { position: relative; z-index: 1; }
-
+    .game-card:hover::before { opacity: 1; }
+    .game-content { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; }
     .game-icon {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, var(--accent), #38bdf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
+      font-size: 2.8rem; margin-bottom: 1.2rem;
+      filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.4));
     }
-
-    .game-title {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
-
-    .game-desc {
-      color: var(--text-muted);
-      line-height: 1.6;
-      font-size: 1rem;
-      margin-bottom: 2rem;
-      flex-grow: 1;
-    }
-
+    .game-title { font-size: 1.55rem; font-weight: 800; margin-bottom: 0.6rem; }
+    .game-desc { color: var(--muted); line-height: 1.6; font-size: 0.95rem; margin-bottom: 1.6rem; flex: 1; }
     .game-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: gap 0.3s;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--amber); font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      font-family: 'JetBrains Mono', monospace;
+      transition: gap 0.3s ease, color 0.3s ease;
     }
-    .game-card:hover .game-link { gap: 0.8rem; }
+    .game-card:hover .game-link { gap: 0.9rem; color: var(--teal); }
+
+    .coming-soon { opacity: 0.55; border-style: dashed; }
+    .coming-soon:hover {
+      transform: none; border-color: var(--line); box-shadow: none; cursor: default;
+    }
+    .coming-soon:hover::before { opacity: 0; }
 
     footer {
-      text-align: center;
-      padding: 3rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--card-border);
-      margin-top: 4rem;
+      text-align: center; padding: 2.4rem 1rem;
+      color: var(--muted); border-top: 1px solid var(--line);
+      font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;
     }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { color: var(--cyan); }
 
-    .coming-soon {
-      opacity: 0.6;
-      border-style: dashed;
-    }
-    .coming-soon:hover {
-      transform: none; border-color: var(--card-border); box-shadow: none; cursor: default;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-animation"></div>
-  
+  <div class="bg-grid" aria-hidden="true"></div>
+
   <header>
-    <a href="/" class="logo">Bryan <span>Koury</span></a>
-    <nav class="nav-links">
-      <a href="/">Back to Main</a>
-    </nav>
+    <a href="/" class="logo"><span>BK</span> arcade<span class="cursor">_</span></a>
+    <a href="/" class="back">← back to bryankoury.com</a>
   </header>
 
   <main>
     <section class="hero">
-      <h1>My Digital Playground</h1>
-      <p>A collection of web-based games and interactive experiments I've built to explore logic, AI, and creative coding. Ready to play?</p>
+      <p class="kicker">// creative coding lab</p>
+      <h1>The <em>Arcade</em></h1>
+      <p>Browser games I've built to explore physics, AI opponents, and rendering. No installs, no accounts — just play.</p>
     </section>
 
     <div class="games-grid" id="gamesGrid">
-      
-      <!-- Voyager -->
+
       <a href="/games/voyager" class="game-card">
         <div class="game-content">
           <div class="game-icon">🌌</div>
           <h2 class="game-title">Voyager</h2>
           <p class="game-desc">Embark on a stellar expedition into deep space. Navigate through the unknown and discover new challenges.</p>
-          <span class="game-link">Play Now &rarr;</span>
+          <span class="game-link">▶ PLAY NOW</span>
         </div>
       </a>
 
-      <!-- Space Invaders -->
-      <a href="/games/space-invaders" class="game-card">
+      <a href="/games/broadside" class="game-card">
         <div class="game-content">
-          <div class="game-icon">👾</div>
-          <h2 class="game-title">Space Invaders</h2>
-          <p class="game-desc">Defend Earth from continuous waves of incoming aliens in this classic arcade reimagining.</p>
-          <span class="game-link">Play Now &rarr;</span>
+          <div class="game-icon">⚓</div>
+          <h2 class="game-title">Broadside</h2>
+          <p class="game-desc">Command a ship of the line on the open sea. Choose your vessel, outmaneuver enemy fleets, and unleash devastating cannon fire in 3D naval combat.</p>
+          <span class="game-link">▶ PLAY NOW</span>
         </div>
       </a>
 
-      <!-- Naval Combat -->
       <a href="/games/naval-combat" class="game-card">
         <div class="game-content">
           <div class="game-icon">🚢</div>
           <h2 class="game-title">Naval Combat</h2>
           <p class="game-desc">Take command of your fleet in strategic seaside battles and outmaneuver your opponent.</p>
-          <span class="game-link">Play Now &rarr;</span>
+          <span class="game-link">▶ PLAY NOW</span>
         </div>
       </a>
 
-      <!-- Broadside -->
-      <a href="/games/broadside" class="game-card">
+      <a href="/games/space-invaders" class="game-card">
         <div class="game-content">
-          <div class="game-icon">⚓</div>
-          <h2 class="game-title">Broadside</h2>
-          <p class="game-desc">Command a ship of the line on the open sea. Choose your vessel, outmaneuver enemy fleets, and unleash devastating cannon fire in this 3D naval combat experience.</p>
-          <span class="game-link">Play Now &rarr;</span>
+          <div class="game-icon">👾</div>
+          <h2 class="game-title">Space Invaders</h2>
+          <p class="game-desc">Defend Earth from continuous waves of incoming aliens in this classic arcade reimagining.</p>
+          <span class="game-link">▶ PLAY NOW</span>
         </div>
       </a>
 
-      <!-- Coming Soon Placeholder -->
-      <a href="#" class="game-card coming-soon">
+      <a href="#" class="game-card coming-soon" aria-disabled="true">
         <div class="game-content">
           <div class="game-icon">🚀</div>
-          <h2 class="game-title">Next Game Launching Soon</h2>
-          <p class="game-desc">I'm currently coding my next interactive experience. Check back later to see what I've built!</p>
-          <span class="game-link">In Development <span style="letter-spacing: 2px;">...</span></span>
+          <h2 class="game-title">Next Game Loading…</h2>
+          <p class="game-desc">The next interactive experience is in development. Check back soon.</p>
+          <span class="game-link">IN DEVELOPMENT…</span>
         </div>
       </a>
-      
+
     </div>
   </main>
 
   <footer>
-    <p>&copy; <span id="year"></span> Bryan Koury. Built with curiosity & code.</p>
+    <p>© <span id="year"></span> Bryan Koury · <a href="/">bryankoury.com</a> · built with curiosity &amp; code</p>
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Mouse glow effect for cards
     document.getElementById('gamesGrid').onmousemove = e => {
-      for(const card of document.getElementsByClassName("game-card")) {
-        const rect = card.getBoundingClientRect(),
-              x = e.clientX - rect.left,
-              y = e.clientY - rect.top;
-        card.style.setProperty("--mouse-x", x + "px");
-        card.style.setProperty("--mouse-y", y + "px");
+      for (const card of document.getElementsByClassName('game-card')) {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+        card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
       }
-    }
+    };
   </script>
 </body>
 </html>
